@@ -1,15 +1,23 @@
 package com.mayurmistry.exception;
 
 import com.mayurmistry.model.ApiErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -31,9 +39,38 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
         }
 
+//        if (exception.getCause() instanceof MethodArgumentNotValidException) {
+//            System.out.println("mayur");
+//        }
+
+        log.error(String.valueOf(exception.getCause()));
         ApiErrorResponse errorResponse = new ApiErrorResponse();
         errorResponse.setError("ISE");
         errorResponse.setMessage("Some error occurred");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(value = UserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
+        apiErrorResponse.setError("USER_NOT_FOUND");
+        apiErrorResponse.setMessage("User not found in system, please register");
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(value = CustomBindingException.class)
+    public ResponseEntity<List<ApiErrorResponse>> handleBindingException(CustomBindingException customBindingException) {
+        BindingResult bindingResult = customBindingException.getBindingResult();
+        List<FieldError> errors = bindingResult.getFieldErrors();
+        List<ApiErrorResponse> apiErrorResponseList = new ArrayList<>();
+        for (FieldError e: errors) {
+            ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
+            apiErrorResponse.setError("BAD_REQUEST");
+            apiErrorResponse.setField(e.getField());
+            apiErrorResponse.setMessage(e.getDefaultMessage());
+            apiErrorResponseList.add(apiErrorResponse);
+        }
+        return new ResponseEntity<>(apiErrorResponseList, HttpStatus.BAD_REQUEST);
+    }
+
 }
