@@ -2,6 +2,7 @@ package com.mayurmistry.service;
 
 import com.mayurmistry.Entity.UserEntity;
 import com.mayurmistry.Repository.UserRepository;
+import com.mayurmistry.exception.CredentialsDoNotMatch;
 import com.mayurmistry.exception.UserNotFoundException;
 import com.mayurmistry.model.LoginRequest;
 import com.mayurmistry.model.RegisterUserRequest;
@@ -24,11 +25,11 @@ public class UserService {
         return true;
     }
 
-    public boolean loginUser(LoginRequest loginRequest) {
+    public UserEntity loginUser(LoginRequest loginRequest) {
         UserEntity userEntity = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
         if (userEntity == null) {
-            throw new UserNotFoundException();
+            throw new CredentialsDoNotMatch();
         }
-        return true;
+        return userEntity;
     }
 }
