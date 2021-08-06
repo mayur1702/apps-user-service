@@ -22,10 +22,16 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     public static final HashMap<String, String> constraintMessage = new HashMap<>();
+    public static final HashMap<String, String> constraintField = new HashMap<>();
 
     GlobalExceptionHandler() {
+        // email
         constraintMessage.put("users.email_UN", "Email id already exists");
+        constraintField.put("users.email_UN", "email");
+
+        // username
         constraintMessage.put("users.username_UN", "username already exists");
+        constraintField.put("users.username_UN", "username");
     }
 
     @ExceptionHandler(value = Exception.class)
@@ -35,6 +41,7 @@ public class GlobalExceptionHandler {
             String constraintName = ((ConstraintViolationException) exception.getCause()).getConstraintName();
             ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
             apiErrorResponse.setError("CONSTRAINT_VIOLATION");
+            apiErrorResponse.setField(constraintField.get(constraintName));
             apiErrorResponse.setMessage(constraintMessage.get(constraintName));
             return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
         }
@@ -55,6 +62,14 @@ public class GlobalExceptionHandler {
         ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
         apiErrorResponse.setError("USER_NOT_FOUND");
         apiErrorResponse.setMessage("User not found in system, please register");
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(value = CredentialsDoNotMatch.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(CredentialsDoNotMatch credentialsDoNotMatch) {
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
+        apiErrorResponse.setError("INVALID_CREDENTIALS");
+        apiErrorResponse.setMessage("Invalid credentials provided, please try again");
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
     }
 

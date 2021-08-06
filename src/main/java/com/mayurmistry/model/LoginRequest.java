@@ -14,10 +14,10 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class LoginRequest {
 
-    @NotNull
+    @NotNull(message = "password cannot be empty")
     @Length(min = 8, message = "password should be of minimum 8 characters")
     private String password;
 
-    @NotNull
+    @NotNull(message = "username cannot be empty")
     private String username;
 }
