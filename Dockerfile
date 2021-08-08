@@ -1,12 +1,6 @@
-#FROM maven
-#WORKDIR /app
-#COPY . .
-#RUN mvn package -Dmaven.test.skip=true
-#EXPOSE 8080
-#ENTRYPOINT ["java","-jar","demo-0.0.1-SNAPSHOT.jar"]
-
-FROM openjdk:16
+FROM maven
 WORKDIR /app
-ADD target/apps-user-service.jar .
+COPY . .
+RUN mvn package -Dmaven.test.skip=true
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","apps-user-service.jar"]
+CMD ["java","-jar","/app/target/apps-user-service.jar"]
