@@ -26,10 +26,14 @@ public class UserService {
     }
 
     public UserEntity loginUser(LoginRequest loginRequest) {
-        UserEntity userEntity = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword());
+        UserEntity userEntity = userRepository.findByUsername(loginRequest.getUsername());
         if (userEntity == null) {
+            throw new UserNotFoundException();
+        }
+        if (!loginRequest.getPassword().equals(userEntity.getPassword())) {
             throw new CredentialsDoNotMatch();
         }
         return userEntity;
+
     }
 }

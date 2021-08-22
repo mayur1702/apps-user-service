@@ -46,10 +46,6 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(apiErrorResponse, HttpStatus.OK);
         }
 
-//        if (exception.getCause() instanceof MethodArgumentNotValidException) {
-//            System.out.println("mayur");
-//        }
-
         log.error(String.valueOf(exception.getCause()));
         ApiErrorResponse errorResponse = new ApiErrorResponse();
         errorResponse.setError("ISE");

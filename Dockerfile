@@ -1,6 +1,5 @@
-FROM maven
+FROM openjdk:16-jdk-alpine
 WORKDIR /app
-COPY . .
-RUN mvn package -Dmaven.test.skip=true
+COPY target/apps-user-service.jar .
 EXPOSE 8080
-CMD ["java","-jar","/app/target/apps-user-service.jar"]
+CMD ["java", "-jar", "/app/apps-user-service.jar"]
